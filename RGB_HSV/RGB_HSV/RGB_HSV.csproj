@@ -57,8 +57,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ViewModel.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Models\Filters\Blur.cs" />
+    <Compile Include="Models\Canny.cs" />
+    <Compile Include="Models\Filters\Gabor.cs" />
+    <Compile Include="Models\Filters\Sodel.cs" />
+    <Compile Include="Models\Formats\HSV.cs" />
+    <Compile Include="Models\Formats\Lab.cs" />
+    <Compile Include="Models\Formats\XYZ.cs" />
+    <Compile Include="Models\KMeans.cs" />
+    <Compile Include="Models\Otsu.cs" />
+    <Compile Include="ViewModels\Command.cs" />
+    <Compile Include="ViewModels\ViewModel.cs" />
+    <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -66,7 +76,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -97,5 +107,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
