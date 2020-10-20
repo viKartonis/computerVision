@@ -60,6 +60,7 @@
     <Compile Include="Models\Filters\Blur.cs" />
     <Compile Include="Models\Canny.cs" />
     <Compile Include="Models\Filters\Gabor.cs" />
+    <Compile Include="Models\ImageUtils.cs" />
     <Compile Include="Models\Filters\Sodel.cs" />
     <Compile Include="Models\Formats\HSV.cs" />
     <Compile Include="Models\Formats\Lab.cs" />

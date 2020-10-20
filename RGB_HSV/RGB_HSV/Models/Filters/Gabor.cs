@@ -2,36 +2,43 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Windows.Data;
 
 namespace RGB_HSV.Models.Filters
 {
     class Gabor
     {
-        private static double _sigma { get; set; }
-        private static double _gamma { get; set; }
-        private static int _size { get; set; }
+        private double _sigma { get; set; }
+        private double _gamma { get; set; }
+        private int _size { get; set; }
+        private double _lambda { get; set; }
+        private double _phi { get; set; }
 
-        private static double GaborFilterValue(int x, int y, double theta, double phi, double lambda, double gamma)
+        public Gabor(double gamma, int size, double lambda, double phi)
         {
-            double rad = Math.PI / 180 * theta;
+            _gamma = gamma;
+            _size = size;
+            _lambda = lambda;
+            _phi = phi;
+        }
+
+        private double GaborFilterValue(int x, int y, double theta)
+        {
+            double rad =theta / 180 * Math.PI;
             double xx = x * Math.Cos(rad) + y * Math.Sin(rad);
             double yy = -x * Math.Sin(rad) + y * Math.Cos(rad);
-            double sigma = lambda * 0.56;
+            _sigma = _lambda * 0.56;
 
-            double envelopeVal = Math.Exp(-((xx * xx + gamma * gamma * yy * yy) / (2.0f * sigma * sigma)));
+            double envelopeVal = Math.Exp(-((xx * xx + _gamma * _gamma * yy * yy) / (2.0f * _sigma * _sigma)));
 
-            double carrierVal = Math.Cos(2.0f * (float)Math.PI * xx / lambda + phi);
+            double carrierVal = Math.Cos(2.0f * (float)Math.PI * xx / _lambda + _phi);
 
             double g = envelopeVal * carrierVal;
 
             return g;
         }
 
-        public static double[,] CreateGaborFilter(int i)
+        public double[,] CreateGaborFilter(int i)
         {
-            _size = 3;
-
             var filter = new double[_size, _size];
 
             int windowSize = _size / 2;
@@ -43,117 +50,115 @@ namespace RGB_HSV.Models.Filters
                     int dy = windowSize + y;
                     int dx = windowSize + x;
 
-
-                    filter[dx, dy] = GaborFilterValue(x, y, i, 0, 2.0, 0.1);
+                    filter[dx, dy] = GaborFilterValue(x, y, i);
                     sum += filter[dx, dy];
 
                 }
             }
 
-            for (int y = -windowSize; y <= windowSize; ++y)
-            {
-                for (int x = -windowSize; x <= windowSize; ++x)
-                {
-                    int dy = windowSize + y;
-                    int dx = windowSize + x;
-
-                    filter[dx, dy] /= sum;
-                }
-            }
             return filter;
         }
 
 
-        public static Bitmap ApplyGabor(Bitmap sourceImage)
+        public Bitmap ApplyGabor(Bitmap sourceImage)
         {
-            var width = sourceImage.Width;
-            var height = sourceImage.Height;
-            var srcData = sourceImage.LockBits(new Rectangle(0, 0, width, height),
-                ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            var bytes = srcData.Stride * srcData.Height;
-            var pixelBuffer1 = new byte[bytes];
-            var pixelBuffer = new byte[bytes];
+            ImageUtils image = new ImageUtils();
+            var width = image.Width;
+            var height = image.Height;
+            var bytes = image.Bytes;
+            var result = new byte[bytes];
 
-            var resultBuffer = new byte[bytes];
-            var srcScan0 = srcData.Scan0;
-            Marshal.Copy(srcScan0, pixelBuffer, 0, bytes);
-            sourceImage.UnlockBits(srcData);
+            var mid = (_size) / 2;
+            var values = new double[width, height];
 
-            var rgb = 0.0;
-            for (int i = 0; i < pixelBuffer.Length; i += 4)
+            var kernel0 = CreateGaborFilter(0);
+            var kernel45 = CreateGaborFilter(45);
+            var kernel135 = CreateGaborFilter(135);
+            var kernel90 = CreateGaborFilter(90);
+
+            for (var y = 0; y < height; ++y)
             {
-                rgb = pixelBuffer[i] * .3f;
-                rgb += pixelBuffer[i + 1] * .6f;
-                rgb += pixelBuffer[i + 2] * .1f;
-                pixelBuffer[i] = (byte)rgb;
-                pixelBuffer[i + 1] = pixelBuffer[i];
-                pixelBuffer[i + 2] = pixelBuffer[i];
-                pixelBuffer[i + 3] = 255;
-            }
-
-            for (int i = 0; i < pixelBuffer.Length; i ++)
-            {
-                pixelBuffer1[i] = 0;
-            }
-
-            for (int i = 0; i < 180; i += 45)
-            {
-                var kernel = CreateGaborFilter(i);
-                var mid = (kernel.GetLength(0) - 1) / 2;
-                var colorChannels = 3;
-                var kcenter = 0;
-                var kpixel = 0;
-                var rgbBuffer = new double[colorChannels];
-
-                for (var y = mid; y < height - mid; ++y)
+                for (var x = 0; x < width; ++x)
                 {
-                    for (var x = mid; x < width - mid; ++x)
+                    var gaborValue = 0.0;
+                    for (var fy = 0; fy < _size; ++fy)
                     {
-                        for (var c = 0; c < colorChannels; ++c)
+                        for (var fx = 0; fx < _size; ++fx)
                         {
-                            rgbBuffer[c] = 0.0;
-                        }
-                        kcenter = y * srcData.Stride + x * 4;
-                        for (var fy = -mid; fy <= mid; ++fy)
-                        {
-                            for (var fx = -mid; fx <= mid; ++fx)
+                            var value = 0.0;
+                            if (x + fx - mid >= 0 && x + fx - mid < width && y + fy - mid >= 0 && y + fy - mid < height)
                             {
-                                kpixel = kcenter + fy * srcData.Stride + fx * 4;
-                                for (var c = 0; c < colorChannels; ++c)
-                                {
-                                    var a = (double)(pixelBuffer[kpixel + c]);
-                                    rgbBuffer[c] += (double)(pixelBuffer[kpixel + c]) * kernel[fy + mid, fx + mid];
-                                }
+                                value = HSV.HsvFromColor(sourceImage.GetPixel(x + fx - mid, y + fy - mid)).V;
                             }
-                        }
-                        for (var c = 0; c < colorChannels; ++c)
-                        {
-                            if (rgbBuffer[c] > 255)
+                            else
                             {
-                                rgbBuffer[c] = 255;
+                                value = HSV.HsvFromColor(sourceImage.GetPixel(x, y)).V;
                             }
-                            else if (rgbBuffer[c] < 0)
-                            {
-                                rgbBuffer[c] = 0;
-                            }
+
+                            gaborValue += kernel0[fy, fx] * value;
+                            gaborValue += kernel45[fy, fx] * value;
+                            gaborValue += kernel90[fy, fx] * value;
+                            gaborValue += kernel135[fy, fx] * value;
                         }
-                        for (var c = 0; c < colorChannels; ++c)
-                        {
-                            pixelBuffer[kcenter + c] = (byte)rgbBuffer[c];
-                            var value = pixelBuffer1[kcenter + c] + pixelBuffer[kcenter + c];
-                                pixelBuffer1[kcenter + c] = (byte)value;
-                        }
-                        pixelBuffer[kcenter + 3] = 255;
-                        pixelBuffer1[kcenter + 3] = 255;
+                    }
+                    values[x, y] = gaborValue;
+                }
+            }
+
+            var max = values[0, 0];
+            var min = values[0,0];
+            for (var y = 0; y < height; ++y)
+            {
+                for (var x = 0; x < width; ++x)
+                {
+                    if (values[x, y] > max)
+                    {
+                        max = values[x, y];
+                    }
+                    if (values[x, y] < min)
+                    {
+                        min = values[x, y];
                     }
                 }
             }
-            Bitmap resultImage = new Bitmap(width, height);
-            BitmapData resultData = resultImage.LockBits(new Rectangle(0, 0, width, height),
-                ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            Marshal.Copy(pixelBuffer1, 0, resultData.Scan0, bytes);
-            resultImage.UnlockBits(resultData);
-            return resultImage;
+            for (var y = 0; y < height; ++y)
+            {
+                for (var x = 0; x < width; ++x)
+                {
+                    if (min < 0)
+                    {
+                        if (max >= 0)
+                        {
+                            values[x, y] -= min;
+                            values[x, y] /= -min + max;
+                            values[x, y] *= 100;
+                        }
+                        else
+                        {
+                            values[x, y] -= min;
+                            values[x, y] /= -min - max;
+                            values[x, y] *= 100;
+                        }
+                    }
+                    else
+                    {
+                        values[x, y] += min;
+                        values[x, y] /= min + max;
+                        values[x, y] *= 100;
+                    }
+                }
+            }
+
+            for (var i = 0; i < bytes; i += 4)
+            {
+                HSV hsv = new HSV { H = 0, S = 0, V = values[(i / 4) % width, (i / 4) / width] };
+                hsv.ToColor();
+                result[i + 0] = hsv.ToColor().R;
+                result[i + 1] = hsv.ToColor().G;
+                result[i + 2] = hsv.ToColor().B;
+                result[i + 3] = 255;
+            }
+            return image.BytesToBitmap(result);
         }
     }
 }

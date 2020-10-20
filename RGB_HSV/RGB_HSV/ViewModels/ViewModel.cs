@@ -291,7 +291,8 @@ namespace RGB_HSV.ViewModels
 
         public void ApplyGabor()
         {
-            Bitmap gabor = Gabor.ApplyGabor(bitmap);
+            Gabor gaborFilter = new Gabor(0.1, 3, 2.0, 0);
+            Bitmap gabor = gaborFilter.ApplyGabor(bitmap);
             bitmap = gabor;
             ImageSource = updateBitmap(gabor);
             showBarChart();

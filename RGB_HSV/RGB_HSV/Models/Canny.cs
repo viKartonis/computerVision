@@ -109,8 +109,8 @@ namespace RGB_HSV.Models.Filters
             }
             commulate /= values.Length;
 
-            var minValue = 10;//0.6 * commulate;
-            var maxValue = 100;//1.2 * commulate;
+            var minValue = 10;
+            var maxValue = 100;
 
             for (var y = 0; y < height; ++y)
             {

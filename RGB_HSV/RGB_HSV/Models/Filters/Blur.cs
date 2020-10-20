@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using RGB_HSV.Models.Filters;
+using System;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RGB_HSV.Models
 {
@@ -39,39 +34,48 @@ namespace RGB_HSV.Models
 
         public static Bitmap blurImage(Bitmap srcImage, double sigma)
         {
-            var width = srcImage.Width;
-            var height = srcImage.Height;
-            var bitmapData = srcImage.LockBits(new Rectangle(0,0,width, height),
-                ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            var bytes = bitmapData.Stride * bitmapData.Height;
-            var buffer = new byte[bytes];
+            ImageUtils image = new ImageUtils();
+            var buffer = image.BitmapToBytes(srcImage);
+            var width = image.Width;
+            var height = image.Height;
+            var bytes = image.Bytes;
             var result = new byte[bytes];
-            Marshal.Copy(bitmapData.Scan0, buffer, 0, bytes);
-            srcImage.UnlockBits(bitmapData);
+
             var colorChannels = 3;
             var rgb = new double[colorChannels];
             var kernel = generateKernel((int)Math.Ceiling(3*sigma), sigma);
             var mid = (kernel.GetLength(0) - 1) / 2;
+            
             var kcenter = 0;
             var kpixel = 0;
 
-            for(var y = mid; y < height - mid; ++y)
+            for(var y = 0; y < height; ++y)
             {
-                for(var x = mid; x < width - mid; ++x)
+                for(var x = 0; x < width; ++x)
                 {
                     for(var c = 0; c < colorChannels; ++c)
                     {
                         rgb[c] = 0.0;
                     }
-                    kcenter = y * bitmapData.Stride + x * 4;
+                    kcenter = y * width*4 + x * 4;
                     for (var fy = -mid; fy <= mid; ++fy)
                     {
                         for (var fx = -mid; fx <= mid; ++fx)
                         {
-                            kpixel = kcenter + fy * bitmapData.Stride + fx * 4;
-                            for (var c = 0; c < colorChannels; ++c)
+                            kpixel = kcenter + fy * width * 4 + fx * 4;
+                            if (kpixel >= 0 && kpixel < bytes)
                             {
-                                rgb[c] += (double)(buffer[kpixel + c]) * kernel[fy + mid, fx + mid];
+                                for (var c = 0; c < colorChannels; ++c)
+                                {
+                                    rgb[c] += (double)(buffer[kpixel + c]) * kernel[fy + mid, fx + mid];
+                                }
+                            }
+                            else
+                            {
+                                for (var c = 0; c < colorChannels; ++c)
+                                {
+                                    rgb[c] += (double)(buffer[kcenter + c]) * kernel[fy + mid, fx + mid];
+                                }
                             }
                         }
                     }
@@ -88,17 +92,12 @@ namespace RGB_HSV.Models
                     }
                     for (var c = 0; c < colorChannels; ++c)
                     {
-                        result[kcenter + c] = (byte)rgb[c];
+                        result[kcenter + c] = (byte)(rgb[c]);
                     }
                     result[kcenter + 3] = 255;
                 }
             }
-            Bitmap resultImage = new Bitmap(width, height);
-            BitmapData resultData = resultImage.LockBits(new Rectangle(0, 0, width, height),
-                ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            Marshal.Copy(result, 0, resultData.Scan0, bytes);
-            resultImage.UnlockBits(resultData);
-            return resultImage;
+            return image.BytesToBitmap(result);
         }
     }
 }

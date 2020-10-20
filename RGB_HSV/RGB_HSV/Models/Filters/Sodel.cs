@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 
 namespace RGB_HSV.Models.Filters
 {
@@ -55,37 +53,35 @@ namespace RGB_HSV.Models.Filters
             return result;
         }
 
-        public static Bitmap ApplySodel(Bitmap sourceImage)
+        public static Bitmap ApplySodel(Bitmap srcImage)
         {
             var xkernel = xSobel;
             var ykernel = ySobel;
-            var width = sourceImage.Width;
-            var height = sourceImage.Height;
-            var srcData = sourceImage.LockBits(new Rectangle(0, 0, width, height),
-                ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            var bytes = srcData.Stride * srcData.Height;
-            var pixelBuffer = new byte[bytes];
-            resultBuffer = new byte[bytes];
+
+            ImageUtils image = new ImageUtils();
+            var buffer = image.BitmapToBytes(srcImage);
+            var width = image.Width;
+            var height = image.Height;
+            var bytes = image.Bytes;
+            var result = new byte[bytes];
+
             directions = new double[bytes/4];
             resultBuf = new byte[bytes / 4];
-            var srcScan0 = srcData.Scan0;
-            Marshal.Copy(srcScan0, pixelBuffer, 0, bytes);
-            sourceImage.UnlockBits(srcData);
 
             var rgb = 0.0;
-            for(int i = 0; i < pixelBuffer.Length; i+=4)
+            for (int i = 0; i < buffer.Length; i += 4)
             {
-                rgb = pixelBuffer[i] * .3f;
-                rgb += pixelBuffer[i + 1] * .6f;
-                rgb += pixelBuffer[i + 2] * .1f;
-                pixelBuffer[i] = (byte)rgb;
-                pixelBuffer[i + 1] = pixelBuffer[i];
-                pixelBuffer[i + 2] = pixelBuffer[i];
-                pixelBuffer[i + 3] = 255;
+                rgb = buffer[i] * .3f;
+                rgb += buffer[i + 1] * .6f;
+                rgb += buffer[i + 2] * .1f;
+                buffer[i] = (byte)rgb;
+                buffer[i + 1] = buffer[i];
+                buffer[i + 2] = buffer[i];
+                buffer[i + 3] = 255;
             }
             var x = 0.0;
             var y = 0.0;
-            var result = 0.0;
+            var results = 0.0;
 
             var filterOffset = 1;
             var calcOffset = 0;
@@ -96,28 +92,28 @@ namespace RGB_HSV.Models.Filters
                 for (var offsetX = filterOffset; offsetX < width - filterOffset; ++offsetX)
                 {
                     x = y = 0;
-                    result = 0.0;
+                    results = 0.0;
 
-                    byteOffset = offsetY * srcData.Stride + offsetX * 4;
+                    byteOffset = offsetY * 4*width + offsetX * 4;
 
                     for(var filterY = -filterOffset; filterY <= filterOffset; filterY++)
                     {
                         for (var filterX = -filterOffset; filterX <= filterOffset; filterX++)
                         {
-                            calcOffset = byteOffset + filterX * 4 + filterY * srcData.Stride;
-                            x += (double)(pixelBuffer[calcOffset]) * xkernel[filterY + filterOffset, filterX + filterOffset];
-                            y += (double)(pixelBuffer[calcOffset]) * ykernel[filterY + filterOffset, filterX + filterOffset];
+                            calcOffset = byteOffset + filterX * 4 + filterY * 4*width;
+                            x += (double)(buffer[calcOffset]) * xkernel[filterY + filterOffset, filterX + filterOffset];
+                            y += (double)(buffer[calcOffset]) * ykernel[filterY + filterOffset, filterX + filterOffset];
                         }
                     }
-                    result += Math.Sqrt((x * x) + (y * y));
+                    results += Math.Sqrt((x * x) + (y * y));
 
-                    if (result > 255)
+                    if (results > 255)
                     {
-                        result = 255;
+                        results = 255;
                     }
-                    else if (result < 0)
+                    else if (results < 0)
                     {
-                        result = 0;
+                        results = 0;
                     }
 
                     if (x != 0)
@@ -137,21 +133,15 @@ namespace RGB_HSV.Models.Filters
                         directions[byteOffset / 4] = 0;
                     }
                     
-                    resultBuf[byteOffset / 4] = (byte)result;
+                    resultBuf[byteOffset / 4] = (byte)results;
 
-                    resultBuffer[byteOffset] = (byte)(result);
-                    resultBuffer[byteOffset + 1] = (byte)(result);
-                    resultBuffer[byteOffset + 2] = (byte)(result);
-                    resultBuffer[byteOffset + 3] = 255;
+                    result[byteOffset] = (byte)(results);
+                    result[byteOffset + 1] = (byte)(results);
+                    result[byteOffset + 2] = (byte)(results);
+                    result[byteOffset + 3] = 255;
                 }
             }
-            Bitmap resultImage = new Bitmap(width, height);
-            BitmapData resultData = resultImage.LockBits(new Rectangle(0, 0, width, height),
-                ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
-            resultImage.UnlockBits(resultData);
-
-            return resultImage;
+            return image.BytesToBitmap(result);
         }
     }
 }
