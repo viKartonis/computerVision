@@ -20,7 +20,7 @@ namespace RGB_HSV.Models.Morphology
             var invertedImage = new byte[image.Length];
             for(var i = 0; i < image.Length; ++i)
             {
-                invertedImage[i] = (byte)((image[i] == 1) ? 0 : 1);
+                invertedImage[i] = (byte)((image[i] == 255) ? 0 : 255);
             }
             return invertedImage;
         }
@@ -47,10 +47,10 @@ namespace RGB_HSV.Models.Morphology
             {
                 for (var k = 0; k < 2; k++)
                 {
-                    for (var j = 0; j < 4; j++)
-                    {
-                        invertedImage[i + j + k * (width - 4)] = (byte)((image[i + j + k * (width - 4)] == 0) ? 255 : 0);
-                    }
+                    //for (var j = 0; j < 4; j++)
+                    //{
+                        invertedImage[i + k * (width - 1)] = (byte)((image[i + k * (width - 1)] == 0) ? 255 : 0);
+                    //}
                 }
             }
 
@@ -183,6 +183,23 @@ namespace RGB_HSV.Models.Morphology
             return result;
         }
 
+        private byte[] invertIntegerValues(byte[] image)
+        {
+            var result = new byte[image.Length];
+            for(var i = 0; i < image.Length; ++i)
+            {
+                if(image[i] == 0)
+                {
+                    result[i] = 255;
+                }
+                else
+                {
+                    result[i] = 0;
+                }
+            }
+            return result;
+        }
+
         public Bitmap ApplyFilling(Bitmap srcImage)
         {
             ImageUtils image = new ImageUtils();
@@ -203,20 +220,8 @@ namespace RGB_HSV.Models.Morphology
             var bytes = image.Bytes;
             var result = new byte[bytes];
 
-            //var rgb = 0.0;
-            //for (int i = 0; i < buffer.Length; i += 4)
-            //{
-            //    rgb = buffer[i] * .3f;
-            //    rgb += buffer[i + 1] * .6f;
-            //    rgb += buffer[i + 2] * .1f;
-            //    buffer[i] = (byte)rgb;
-            //    buffer[i + 1] = buffer[i];
-            //    buffer[i + 2] = buffer[i];
-            //    buffer[i + 3] = 255;
-            //}
+            buffer = invertIntegerValues(buffer);
 
-            buffer = invertImage(buffer);
-           
             var invertedImage = invertImage(buffer);
             var markerImage = invertEdgeImage(buffer, 6);
 
