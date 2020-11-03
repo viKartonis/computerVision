@@ -66,8 +66,16 @@
             <Button Click="ApplySobel" Content="Apply Sobel" x:Name="Sobel"/>
             <Button Click="ApplyCanny" Content="Apply Canny" x:Name="Canny"/>
         </StackPanel>
-        <Button Grid.Column="2" Grid.Row="2" Click="ApplyGabor" Content="Apply Gabor" x:Name="Gabor"/>
-        <Button Grid.Column="2" Grid.Row="3" Click="ApplyOtsu" Content="Apply Otsu" x:Name="Otsu"/>
-        <Button Grid.Column="0" Grid.Row="7" Click="RemoveBackground" Content="Remove background" x:Name="RemoveBG"/>
+        <StackPanel Grid.Column="2"  Grid.Row="2" Orientation="Vertical">
+            <Button Click="ApplyGabor" Content="Apply Gabor" x:Name="Gabor"/>
+            <Button Click="ApplyOtsu" Content="Apply Otsu" x:Name="Otsu"/>
+            <Button Click="ApplyErosion" Content="Apply Erosion" x:Name="Erosion"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2"  Grid.Row="3" Orientation="Vertical">
+            <Button Click="ApplyDilatation" Content="Apply Dilatation" x:Name="Dilatation"/>
+            <Button Click="ApplyClosing" Content="Apply closing" x:Name="Closing"/>
+            <Button Click="ApplyFilling" Content="Apply filling" x:Name="Filling"/>
+        </StackPanel>
+        <Button Grid.Column="0" Grid.Row="7" Click="ApplyOpening" Content="Apply opening" x:Name="Opening"/>
     </Grid>
 </Window>

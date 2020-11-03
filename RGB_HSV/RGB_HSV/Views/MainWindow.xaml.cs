@@ -49,6 +49,31 @@ namespace RGB_HSV.Views
             viewModel.ApplyOtsu();
         }
 
+        private void ApplyFilling(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyFilling();
+        }
+
+        private void ApplyErosion(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyErosion();
+        }
+
+        private void ApplyDilatation(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyDilatation();
+        }
+
+        private void ApplyClosing(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyClosing();
+        }
+
+        private void ApplyOpening(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyOpening();
+        }
+
         private void mainImage_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             var point = e.GetPosition(mainImage);

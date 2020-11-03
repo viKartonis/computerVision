@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using RGB_HSV.Models;
 using RGB_HSV.Models.Filters;
+using RGB_HSV.Models.Morphology;
 
 namespace RGB_HSV.ViewModels
 {
@@ -304,6 +305,57 @@ namespace RGB_HSV.ViewModels
             Bitmap otsu = Otsu.ApplyOtsu(bitmap);
             bitmap = otsu;
             ImageSource = updateBitmap(otsu);
+            showBarChart();
+        }
+
+        public void ApplyErosion()
+        {
+            Erosion erosionMethod = new Erosion();
+            Bitmap erosion = erosionMethod.ApplyErosion(bitmap);
+            bitmap = erosion;
+            ImageSource = updateBitmap(erosion);
+            showBarChart();
+        }
+
+        public void ApplyDilatation()
+        {
+            Dilatation dilatationMethod = new Dilatation();
+            Bitmap dilatation = dilatationMethod.ApplyDilatation(bitmap);
+            bitmap = dilatation;
+            ImageSource = updateBitmap(dilatation);
+            showBarChart();
+        }
+
+        public void ApplyOpening()
+        {
+            Erosion erosionMethod = new Erosion();
+            Bitmap erosion = erosionMethod.ApplyErosion(bitmap);
+            bitmap = erosion;
+            Dilatation dilatationMethod = new Dilatation();
+            Bitmap dilatation = dilatationMethod.ApplyDilatation(bitmap);
+            bitmap = dilatation;
+            ImageSource = updateBitmap(dilatation);
+            showBarChart();
+        }
+
+        public void ApplyClosing()
+        {
+            Dilatation dilatationMethod = new Dilatation();
+            Bitmap dilatation = dilatationMethod.ApplyDilatation(bitmap);
+            bitmap = dilatation;
+            Erosion erosionMethod = new Erosion();
+            Bitmap erosion = erosionMethod.ApplyErosion(bitmap);
+            bitmap = erosion;
+            ImageSource = updateBitmap(erosion);
+            showBarChart();
+        }
+
+        public void ApplyFilling()
+        {
+            Filling fillingMethod = new Filling();
+            Bitmap filling = fillingMethod.ApplyFilling(bitmap);
+            bitmap = filling;
+            ImageSource = updateBitmap(filling);
             showBarChart();
         }
 

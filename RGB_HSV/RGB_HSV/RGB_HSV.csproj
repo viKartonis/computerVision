@@ -59,6 +59,7 @@
     </ApplicationDefinition>
     <Compile Include="Models\Filters\Blur.cs" />
     <Compile Include="Models\Canny.cs" />
+    <Compile Include="Models\Morphology\Dilatation.cs" />
     <Compile Include="Models\Filters\Gabor.cs" />
     <Compile Include="Models\ImageUtils.cs" />
     <Compile Include="Models\Filters\Sodel.cs" />
@@ -66,6 +67,8 @@
     <Compile Include="Models\Formats\Lab.cs" />
     <Compile Include="Models\Formats\XYZ.cs" />
     <Compile Include="Models\KMeans.cs" />
+    <Compile Include="Models\Morphology\Erosion.cs" />
+    <Compile Include="Models\Morphology\Filling.cs" />
     <Compile Include="Models\Otsu.cs" />
     <Compile Include="ViewModels\Command.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
