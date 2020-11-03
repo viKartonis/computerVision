@@ -353,9 +353,16 @@ namespace RGB_HSV.ViewModels
         public void ApplyFilling()
         {
             Filling fillingMethod = new Filling();
-            Bitmap filling = fillingMethod.ApplyFilling(bitmap);
-            bitmap = filling;
-            ImageSource = updateBitmap(filling);
+            //Bitmap filling = fillingMethod.ApplyFilling(bitmap);
+            //bitmap = filling;
+            //ImageSource = updateBitmap(filling);
+            //showBarChart();
+
+            foreach (var filling in fillingMethod.ApplyFilling(bitmap))
+            {
+                bitmap = filling;
+                ImageSource = updateBitmap(filling);
+            }
             showBarChart();
         }
 
