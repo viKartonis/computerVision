@@ -27,17 +27,6 @@ namespace RGB_HSV.Models.Morphology
             var bytes = image.Bytes;
             var result = new byte[bytes];
 
-            var rgb = 0.0;
-            for (int i = 0; i < buffer.Length; i += 4)
-            {
-                rgb = buffer[i] * .3f;
-                rgb += buffer[i + 1] * .6f;
-                rgb += buffer[i + 2] * .1f;
-                buffer[i] = (byte)rgb;
-                buffer[i + 1] = buffer[i];
-                buffer[i + 2] = buffer[i];
-                buffer[i + 3] = 255;
-            }
             var filterOffsetY = 1;
             var filterOffsetX = 1;
             var calcOffset = 0;

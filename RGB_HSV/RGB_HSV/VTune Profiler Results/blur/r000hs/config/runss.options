@@ -1,0 +1,15 @@
+-r
+C:\Users\user\source\repos\computerVision\RGB_HSV\RGB_HSV\VTune Profiler Results\blur\r000hs
+--stack-stitching
+--data-limit-mb=1000
+--disk-space-limit=0
+--mrte-type=java,dotnet,python
+--itt-config=frame
+--itt-config=task,event,counter
+--stackwalk=offline
+--mrte-mode=auto
+--type=cpu:counters:nostack
+--type=cpu:stack
+--interval=10
+--
+C:\Users\user\Desktop\GaussianBlurExperiment\WorkProject\out\build\x64-Debug (по умолчанию)\WorkProject.exe

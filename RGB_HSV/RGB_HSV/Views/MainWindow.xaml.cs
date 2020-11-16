@@ -24,11 +24,6 @@ namespace RGB_HSV.Views
             }
         }
 
-        private void RemoveBackground(object sender, RoutedEventArgs e)
-        {
-            viewModel.RemoveBackground();
-        }
-
         private void ApplySobel(object sender, RoutedEventArgs e)
         {
             viewModel.ApplySobel();
@@ -47,6 +42,23 @@ namespace RGB_HSV.Views
         private void ApplyOtsu(object sender, RoutedEventArgs e)
         {
             viewModel.ApplyOtsu();
+        }
+
+        private void ApplyIntensityTransform(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyIntensityTransform();
+        }
+
+        private void ApplyDistanceTransform(object sender, RoutedEventArgs e)
+        {
+
+            viewModel.ApplyDistanceTransform();
+        }
+
+        private void ApplyCountingObjects(object sender, RoutedEventArgs e)
+        {
+            var count = viewModel.ApplyCountingObjects();
+            MessageBox.Show($"Detected {count} cells on image", "Number of objects", MessageBoxButton.OK);
         }
 
         private void ApplyFilling(object sender, RoutedEventArgs e)
@@ -77,8 +89,8 @@ namespace RGB_HSV.Views
         private void mainImage_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             var point = e.GetPosition(mainImage);
-            if (point.X >= 0 && point.Y >= 0 && point.X < viewModel.bitmap.Width 
-                && point.Y < viewModel.bitmap.Height)
+            if (point.X >= 0 && point.Y >= 0 && point.X < viewModel.BitmapProperty.Width
+                && point.Y < viewModel.BitmapProperty.Height)
             {
                 viewModel.getPixelFormats(point);
             }

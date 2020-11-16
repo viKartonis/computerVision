@@ -9,6 +9,8 @@ namespace RGB_HSV.Models
         public double S { get; set; }
         public double V { get; set; }
 
+        public Bitmap PreviousBitmap { get; set; }
+
         public static HSV HsvFromColor(Color color)
         {
             byte red = color.R, green = color.G, blue = color.B;
@@ -44,7 +46,91 @@ namespace RGB_HSV.Models
             return new HSV { H = hue, S = saturation * 100, V = max * 100 };
         }
 
-        public Color ToColor()
+        public Bitmap changeH(Bitmap bitmap, string HValue)
+        {
+            if (!double.TryParse(HValue, out var value))
+            {
+                return null;
+            }
+            int width = bitmap.Width;
+            int height = bitmap.Height;
+            PreviousBitmap = (Bitmap)bitmap.Clone();
+            for (int i = 0; i < width; ++i)
+            {
+                for (int j = 0; j < height; ++j)
+                {
+                    Color pixel = bitmap.GetPixel(i, j);
+                    HSV hsv = HSV.HsvFromColor(pixel);
+                    hsv.H += value;
+                    if (hsv.H > 360 || hsv.H < 0)
+                    {
+                        hsv.H -= value;
+                        continue;
+                    }
+                    Color color = hsv.ToColor();
+                    bitmap.SetPixel(i, j, color);
+                }
+            }
+            return bitmap;
+        }
+
+        public Bitmap changeS(Bitmap bitmap, string SValue)
+        {
+            if (!double.TryParse(SValue, out var value))
+            {
+                return null;
+            }
+            int width = bitmap.Width;
+            int height = bitmap.Height;
+            PreviousBitmap = (Bitmap)bitmap.Clone();
+            for (int i = 0; i < width; ++i)
+            {
+                for (int j = 0; j < height; ++j)
+                {
+                    Color pixel = bitmap.GetPixel(i, j);
+                    HSV hsv = HSV.HsvFromColor(pixel);
+                    hsv.S += value;
+                    if (hsv.S > 100 || hsv.S < 0)
+                    {
+                        hsv.S -= value;
+                        continue;
+                    }
+                    Color color = hsv.ToColor();
+                    bitmap.SetPixel(i, j, color);
+                }
+            }
+            return bitmap;
+        }
+
+        public Bitmap changeV(Bitmap bitmap, string VValue)
+        {
+            if (!double.TryParse(VValue, out var value))
+            {
+                return null;
+            }
+            int width = bitmap.Width;
+            int height = bitmap.Height;
+            PreviousBitmap = (Bitmap)bitmap.Clone();
+            for (int i = 0; i < width; ++i)
+            {
+                for (int j = 0; j < height; ++j)
+                {
+                    Color pixel = bitmap.GetPixel(i, j);
+                    HSV hsv = HSV.HsvFromColor(pixel);
+                    hsv.V += value;
+                    if (hsv.V > 100 || hsv.V < 0)
+                    {
+                        hsv.V -= value;
+                        continue;
+                    }
+                    Color color = hsv.ToColor();
+                    bitmap.SetPixel(i, j, color);
+                }
+            }
+            return bitmap;
+        }
+
+            public Color ToColor()
         {
             var color = new Color();
             var h_i = (int)Math.Floor(H / 60.0) % 6;

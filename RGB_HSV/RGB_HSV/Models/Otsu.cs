@@ -37,10 +37,13 @@ namespace RGB_HSV.Models
             int[] hist = new int[256];
 
             for (int t = 0; t < 256; t++)
+            {
                 hist[t] = 0;
-
+            }
             for (int i = 0; i < buffer.Length; i++)
+            {
                 hist[buffer[i]]++;
+            }
 
             int m = 0; 
             int n = 0; 
@@ -56,7 +59,7 @@ namespace RGB_HSV.Models
             int alpha1 = 0; 
             int beta1 = 0; 
 
-            for (int t = 0; t < 255 - 0; t++)
+            for (int t = 0; t < 255; t++)
             {
                 alpha1 += t * hist[t];
                 beta1 += hist[t];

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using RGB_HSV.Models;
@@ -15,35 +16,36 @@ namespace RGB_HSV.ViewModels
 {
     class ViewModel : INotifyPropertyChanged
     {
-        private BitmapImage imageSource;
-        private BitmapImage barChart;
-        private string pixelInfo;
+        private BitmapImage _imageSource;
+        private Histogram _histogram = new Histogram();
+        private BitmapImage _barChart;
+        private string _pixelInfo;
 
-        public Bitmap bitmap;
+        public Bitmap BitmapProperty { get; set; }
         public BitmapImage ImageSource
         {
-            get => imageSource;
+            get => _imageSource;
             private set
             {
-                imageSource = value;
+                _imageSource = value;
                 OnPropertyChanged(nameof(ImageSource));
             }
         }
         public BitmapImage BarChart
         {
-            get => barChart;
+            get => _barChart;
             private set
             {
-                barChart = value;
+                _barChart = value;
                 OnPropertyChanged(nameof(BarChart));
             }
         }
         public string PixelInfo
         {
-            get => pixelInfo;
+            get => _pixelInfo;
             private set
             {
-                pixelInfo = value;
+                _pixelInfo = value;
                 OnPropertyChanged(nameof(PixelInfo));
             }
         }
@@ -67,38 +69,15 @@ namespace RGB_HSV.ViewModels
             BluringCommand = new Command(blurImage);
         }
 
-        private const int widthBarChart = 200;
-        private const int heightBarChart = 100;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void LoadImage(string fileName)
         {
-            bitmap = new Bitmap(fileName);
-            showBarChart();
+            BitmapProperty = new Bitmap(fileName);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
             ImageSource = new BitmapImage(new Uri(fileName));
         }
 
-        private Dictionary<int, int> getDictionary(Bitmap bitmap)
-        {
-            var width = bitmap.Width;
-            var height = bitmap.Height;
-            Color pixel;
-            var lValues = new Dictionary<int, int>();
-            Lab lab;
-            for (var i = 0; i < height; ++i)
-            {
-                for (var j = 0; j < width; ++j)
-                {
-                    pixel = bitmap.GetPixel(j, i);
-                    var xyz = XYZ.XyzFromColor(pixel);
-                    lab = Lab.LabFromXYZ(xyz);
-                    var l = (int)lab.L;
-                    lValues[l] = lValues.TryGetValue(l, out int val) ? val + 1 : 1;
-                }
-            }
-            return lValues;
-        }
         private BitmapImage updateBitmap(Bitmap bitmap)
         {
             using (var memory = new MemoryStream())
@@ -114,47 +93,9 @@ namespace RGB_HSV.ViewModels
             }
         }
 
-        private void showBarChart()
-        {
-            var width = bitmap.Width;
-            var height = bitmap.Height;
-
-            var image = bitmap.Clone() as Bitmap;
-            var lValues = getDictionary(image);
-            var max = lValues.Max(kv => kv.Value);
-            var lValuesCount = lValues.Count;
-
-            var extandBarChart = new Bitmap(widthBarChart, heightBarChart);
-            var color = new Color();
-            color = Color.FromArgb(Byte.MaxValue, Byte.MaxValue, Byte.MaxValue);
-
-            for (var i = 0; i < widthBarChart; ++i)
-            {
-                for (var j = 0; j < heightBarChart; ++j)
-                {
-                    extandBarChart.SetPixel(i, j, color);
-                }
-            }
-            color = Color.FromArgb(0, 0, 0);
-
-            for (var i = 0; i < widthBarChart; i += 2)
-            {
-                if (lValues.ContainsKey(i / 2))
-                {
-                    var currentHeight = (int)Math.Floor(1.0 * lValues[i / 2] / max * 100);
-                    for (var j = heightBarChart - currentHeight; j < heightBarChart; ++j)
-                    {
-                        extandBarChart.SetPixel(i, j, color);
-                        extandBarChart.SetPixel(i + 1, j, color);
-                    }
-                }
-            }
-            BarChart = updateBitmap(extandBarChart);
-        }
-
         public void getPixelFormats(System.Windows.Point point)
         {
-            Color color = bitmap.GetPixel(Convert.ToInt32(point.X), Convert.ToInt32(point.Y));
+            Color color = BitmapProperty.GetPixel(Convert.ToInt32(point.X), Convert.ToInt32(point.Y));
             byte red = color.R, green = color.G, blue = color.B;
             HSV hsv = HSV.HsvFromColor(color);
             XYZ xyz = XYZ.XyzFromColor(color);
@@ -166,95 +107,29 @@ namespace RGB_HSV.ViewModels
 
         public void changeH()
         {
-            if (!double.TryParse(HValue, out var value))
-            {
-                return;
-            }
-            int width = bitmap.Width;
-            int height = bitmap.Height;
-            Bitmap trueBitmap = (Bitmap)bitmap.Clone();
-            for (int i = 0; i < width; ++i)
-            {
-                for (int j = 0; j < height; ++j)
-                {
-                    Color pixel = bitmap.GetPixel(i, j);
-                    HSV hsv = HSV.HsvFromColor(pixel);
-                    hsv.H += value;
-                    if (hsv.H > 360 || hsv.H < 0)
-                    {
-                        hsv.H -= value;
-                        continue;
-                    }
-                    Color color = hsv.ToColor();
-                    bitmap.SetPixel(i, j, color);
-                }
-            }
-            ImageSource = updateBitmap(bitmap);
-
-            showBarChart();
-            bitmap = trueBitmap;
+            HSV hsv = new HSV();
+            hsv.changeH(BitmapProperty, HValue);
+            ImageSource = updateBitmap(BitmapProperty);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+            BitmapProperty = hsv.PreviousBitmap;
         }
 
         public void changeS()
         {
-            if (!double.TryParse(SValue, out var value))
-            {
-                return;
-            }
-            int width = bitmap.Width;
-            int height = bitmap.Height;
-            Bitmap trueBitmap = (Bitmap)bitmap.Clone();
-            for (int i = 0; i < width; ++i)
-            {
-                for (int j = 0; j < height; ++j)
-                {
-                    Color pixel = bitmap.GetPixel(i, j);
-                    HSV hsv = HSV.HsvFromColor(pixel);
-                    hsv.S += value;
-                    if (hsv.S > 100 || hsv.S < 0)
-                    {
-                        hsv.S -= value;
-                        continue;
-                    }
-                    Color color = hsv.ToColor();
-                    bitmap.SetPixel(i, j, color);
-                }
-            }
-            ImageSource = updateBitmap(bitmap);
-
-            showBarChart();
-            bitmap = trueBitmap;
+            HSV hsv = new HSV();
+            hsv.changeS(BitmapProperty, SValue);
+            ImageSource = updateBitmap(BitmapProperty);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+            BitmapProperty = hsv.PreviousBitmap;
         }
 
         public void changeV()
         {
-            if (!double.TryParse(VValue, out var value))
-            {
-                return;
-            }
-            int width = bitmap.Width;
-            int height = bitmap.Height;
-            Bitmap trueBitmap = (Bitmap)bitmap.Clone();
-            for (int i = 0; i < width; ++i)
-            {
-                for (int j = 0; j < height; ++j)
-                {
-                    Color pixel = bitmap.GetPixel(i, j);
-                    HSV hsv = HSV.HsvFromColor(pixel);
-                    hsv.V += value;
-                    if (hsv.V > 100 || hsv.V < 0)
-                    {
-                        hsv.V -= value;
-                        continue;
-                    }
-                    Color color = hsv.ToColor();
-                    bitmap.SetPixel(i, j, color);
-                }
-            }
-            ImageSource = updateBitmap(bitmap);
-
-            showBarChart();
-            bitmap = trueBitmap;
+            HSV hsv = new HSV();
+            hsv.changeV(BitmapProperty, VValue);
+            ImageSource = updateBitmap(BitmapProperty);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+            BitmapProperty = hsv.PreviousBitmap;
         }
 
         protected virtual void OnPropertyChanged(string propertyName = null)
@@ -268,136 +143,137 @@ namespace RGB_HSV.ViewModels
             {
                 return;
             }
-            Bitmap blur = Blur.blurImage(bitmap, value);
-            bitmap = blur;
+            Bitmap blur = Blur.blurImage(BitmapProperty, value);
+            BitmapProperty = blur;
             ImageSource = updateBitmap(blur);
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
         public void ApplySobel()
         {
-            Bitmap sobel = Sodel.ApplySodel(bitmap);
-            bitmap = sobel;
+            Bitmap sobel = Sodel.ApplySodel(BitmapProperty);
+            BitmapProperty = sobel;
             ImageSource = updateBitmap(sobel);
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
         public void ApplyCanny()
         {
-            Bitmap canny = Canny.ApplyCanny(bitmap);
-            bitmap = canny;
+            Bitmap canny = Canny.ApplyCanny(BitmapProperty);
+            BitmapProperty = canny;
             ImageSource = updateBitmap(canny);
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
         public void ApplyGabor()
         {
             Gabor gaborFilter = new Gabor(0.1, 3, 2.0, 0);
-            Bitmap gabor = gaborFilter.ApplyGabor(bitmap);
-            bitmap = gabor;
+            Bitmap gabor = gaborFilter.ApplyGabor(BitmapProperty);
+            BitmapProperty = gabor;
             ImageSource = updateBitmap(gabor);
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
 
         public void ApplyOtsu()
         {
-            Bitmap otsu = Otsu.ApplyOtsu(bitmap);
-            bitmap = otsu;
+            Bitmap otsu = Otsu.ApplyOtsu(BitmapProperty);
+            BitmapProperty = otsu;
             ImageSource = updateBitmap(otsu);
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
         public void ApplyErosion()
         {
             Erosion erosionMethod = new Erosion();
-            Bitmap erosion = erosionMethod.ApplyErosion(bitmap);
-            bitmap = erosion;
+            Bitmap erosion = erosionMethod.ApplyErosion(BitmapProperty);
+            BitmapProperty = erosion;
             ImageSource = updateBitmap(erosion);
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
         public void ApplyDilatation()
         {
             Dilatation dilatationMethod = new Dilatation();
-            Bitmap dilatation = dilatationMethod.ApplyDilatation(bitmap);
-            bitmap = dilatation;
+            Bitmap dilatation = dilatationMethod.ApplyDilatation(BitmapProperty);
+            BitmapProperty = dilatation;
             ImageSource = updateBitmap(dilatation);
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
         public void ApplyOpening()
         {
             Erosion erosionMethod = new Erosion();
-            Bitmap erosion = erosionMethod.ApplyErosion(bitmap);
-            bitmap = erosion;
+            Bitmap erosion = erosionMethod.ApplyErosion(BitmapProperty);
+            BitmapProperty = erosion;
             Dilatation dilatationMethod = new Dilatation();
-            Bitmap dilatation = dilatationMethod.ApplyDilatation(bitmap);
-            bitmap = dilatation;
+            Bitmap dilatation = dilatationMethod.ApplyDilatation(BitmapProperty);
+            BitmapProperty = dilatation;
             ImageSource = updateBitmap(dilatation);
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
         public void ApplyClosing()
         {
             Dilatation dilatationMethod = new Dilatation();
-            Bitmap dilatation = dilatationMethod.ApplyDilatation(bitmap);
-            bitmap = dilatation;
+            Bitmap dilatation = dilatationMethod.ApplyDilatation(BitmapProperty);
+            BitmapProperty = dilatation;
             Erosion erosionMethod = new Erosion();
-            Bitmap erosion = erosionMethod.ApplyErosion(bitmap);
-            bitmap = erosion;
+            Bitmap erosion = erosionMethod.ApplyErosion(BitmapProperty);
+            BitmapProperty = erosion;
             ImageSource = updateBitmap(erosion);
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
         public void ApplyFilling()
         {
             Filling fillingMethod = new Filling();
-            //Bitmap filling = fillingMethod.ApplyFilling(bitmap);
-            //bitmap = filling;
-            //ImageSource = updateBitmap(filling);
-            //showBarChart();
 
-            foreach (var filling in fillingMethod.ApplyFilling(bitmap))
+            foreach (var filling in fillingMethod.ApplyFilling(BitmapProperty))
             {
-                bitmap = filling;
+                BitmapProperty = filling;
                 ImageSource = updateBitmap(filling);
             }
-            showBarChart();
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
+        
+        public void ApplyDistanceTransform()
+        {
+            DistanceTransform distanseTransformMethod = new DistanceTransform();
+            Bitmap distanceTransform = distanseTransformMethod.ApplyDistanceTransform(BitmapProperty);
+            BitmapProperty = distanceTransform;
+            ImageSource = updateBitmap(distanceTransform);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
+        public int ApplyCountingObjects()
+        {
+            CountingObjects countigObjectsMethod = new CountingObjects();
+            var count = countigObjectsMethod.CountObjects(BitmapProperty);
+            return count;
         }
 
-        public void RemoveBackground()
+        public void ApplyIntensityTransform()
         {
-            var width = bitmap.Width;
-            var height = bitmap.Height;
-
-            var hValues = new Dictionary<int, int>();
-            var hsvImage = new Dictionary<Point, HSV>();
-            var hue = 0;
-            Color pixel;
+            var threshold = 60;
+            var width = BitmapProperty.Width;
+            var height = BitmapProperty.Height;
             for (var i = 0; i < height; ++i)
             {
                 for (var j = 0; j < width; ++j)
                 {
-
-                    pixel = bitmap.GetPixel(j, i);
-                    var hsv = HSV.HsvFromColor(bitmap.GetPixel(j, i));
-                    hue = (int)hsv.H;
-                    if (hue < 0)
+                    if(BitmapProperty.GetPixel(j, i).R > threshold)
                     {
-                        continue;
+                        var color = Color.FromArgb(255, 255, 255);
+                        BitmapProperty.SetPixel(j, i, color);
                     }
-                    hsvImage[new Point(j, i)] = hsv;
-                    hValues[hue] = hValues.TryGetValue(hue, out int val) ? val + 1 : 1;
+                    else
+                    {
+                        var color = Color.FromArgb(0, 0, 0);
+                        BitmapProperty.SetPixel(j, i, color);
+                    }
                 }
             }
-            KMeans.Segmentation(hsvImage);
-            foreach (Point point in hsvImage.Keys)
-            {
-                Color color = hsvImage[point].ToColor();
-                bitmap.SetPixel(point.X, point.Y, color);
-            }
-            ImageSource = updateBitmap(bitmap);
+            ImageSource = updateBitmap(BitmapProperty);
         }
     }
 }

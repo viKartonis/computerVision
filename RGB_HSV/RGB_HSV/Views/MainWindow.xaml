@@ -65,6 +65,7 @@
         <StackPanel Grid.Column="2"  Grid.Row="1" Orientation="Vertical">
             <Button Click="ApplySobel" Content="Apply Sobel" x:Name="Sobel"/>
             <Button Click="ApplyCanny" Content="Apply Canny" x:Name="Canny"/>
+            <Button Click="ApplyOpening" Content="Apply opening" x:Name="Opening"/>
         </StackPanel>
         <StackPanel Grid.Column="2"  Grid.Row="2" Orientation="Vertical">
             <Button Click="ApplyGabor" Content="Apply Gabor" x:Name="Gabor"/>
@@ -76,6 +77,11 @@
             <Button Click="ApplyClosing" Content="Apply closing" x:Name="Closing"/>
             <Button Click="ApplyFilling" Content="Apply filling" x:Name="Filling"/>
         </StackPanel>
-        <Button Grid.Column="0" Grid.Row="7" Click="ApplyOpening" Content="Apply opening" x:Name="Opening"/>
+        <StackPanel Grid.Column="2"  Grid.Row="4" Orientation="Vertical">
+            <Button Click="ApplyDistanceTransform" Content="Distance Transform" x:Name="DistanceTransform"/>
+            <Button Click="ApplyIntensityTransform" Content="Intensity Transform" x:Name="IntensityTransform"/>
+            <Button Click="ApplyCountingObjects" Content="Counting objects" x:Name="CountObject"/>
+        </StackPanel>
+      
     </Grid>
 </Window>

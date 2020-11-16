@@ -57,8 +57,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\CountingObjectscs.cs" />
     <Compile Include="Models\Filters\Blur.cs" />
     <Compile Include="Models\Canny.cs" />
+    <Compile Include="Models\Histogram.cs" />
     <Compile Include="Models\Morphology\Dilatation.cs" />
     <Compile Include="Models\Filters\Gabor.cs" />
     <Compile Include="Models\ImageUtils.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="Models\Formats\Lab.cs" />
     <Compile Include="Models\Formats\XYZ.cs" />
     <Compile Include="Models\KMeans.cs" />
+    <Compile Include="Models\Morphology\DistanceTransform.cs" />
     <Compile Include="Models\Morphology\Erosion.cs" />
     <Compile Include="Models\Morphology\Filling.cs" />
     <Compile Include="Models\Otsu.cs" />
