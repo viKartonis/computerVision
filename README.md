@@ -19,7 +19,7 @@ Display rgb, hsv, lab formats, l-histogram, ability to change h, s and v
 ## Lab3
 Cell counting by morphology
 ### Cells image
-![Lab3](Images/cells.PNG)
+![Lab3](Images/cells.jpg)
 ### Otsu
 ![Lab3](Images/OtsuCell.PNG)
 ### Filling cells
@@ -29,7 +29,7 @@ Cell counting by morphology
 ### Intensity transform
 ![Lab3](Images/intensy.PNG)
 ### After erosion and dilation
-![Lab3](Image/count.PNG)
+![Lab3](Images/count.PNG)
 ### Number of cells
 ![Lab3](Images/dialogWindow.PNG) 
 
