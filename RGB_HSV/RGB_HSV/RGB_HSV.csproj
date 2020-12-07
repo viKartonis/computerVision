@@ -68,11 +68,13 @@
     <Compile Include="Models\Formats\HSV.cs" />
     <Compile Include="Models\Formats\Lab.cs" />
     <Compile Include="Models\Formats\XYZ.cs" />
-    <Compile Include="Models\KMeans.cs" />
+    <Compile Include="Models\Segmantation\KMeans.cs" />
     <Compile Include="Models\Morphology\DistanceTransform.cs" />
     <Compile Include="Models\Morphology\Erosion.cs" />
     <Compile Include="Models\Morphology\Filling.cs" />
     <Compile Include="Models\Otsu.cs" />
+    <Compile Include="Models\Segmantation\NormCut.cs" />
+    <Compile Include="Models\Segmantation\SplitAndMerge.cs" />
     <Compile Include="ViewModels\Command.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="Views\MainWindow.xaml">

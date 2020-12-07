@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using RGB_HSV.Models;
 using RGB_HSV.Models.Filters;
 using RGB_HSV.Models.Morphology;
+using RGB_HSV.Models.Segmantation;
 
 namespace RGB_HSV.ViewModels
 {
@@ -95,7 +93,15 @@ namespace RGB_HSV.ViewModels
 
         public void getPixelFormats(System.Windows.Point point)
         {
-            Color color = BitmapProperty.GetPixel(Convert.ToInt32(point.X), Convert.ToInt32(point.Y));
+            Color color = new Color();
+            try
+            {
+               color = BitmapProperty.GetPixel(Convert.ToInt32(point.X), Convert.ToInt32(point.Y));
+            }
+            catch(ArgumentOutOfRangeException ex)
+            {
+
+            }
             byte red = color.R, green = color.G, blue = color.B;
             HSV hsv = HSV.HsvFromColor(color);
             XYZ xyz = XYZ.XyzFromColor(color);
@@ -162,6 +168,15 @@ namespace RGB_HSV.ViewModels
             Bitmap canny = Canny.ApplyCanny(BitmapProperty);
             BitmapProperty = canny;
             ImageSource = updateBitmap(canny);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
+
+        public void SplitAndMerge()
+        {
+            SplitAndMerge segmantationMethod = new SplitAndMerge();
+            Bitmap sam = segmantationMethod.ApplyMethod(BitmapProperty);
+            BitmapProperty = sam;
+            ImageSource = updateBitmap(sam);
             BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
@@ -245,6 +260,26 @@ namespace RGB_HSV.ViewModels
             ImageSource = updateBitmap(distanceTransform);
             BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
+
+        public void ApplyKMeans()
+        {
+            KMeans kmeans = new KMeans();
+            Bitmap kmeansBitmap = kmeans.ApplyMethod(BitmapProperty);
+            BitmapProperty = kmeansBitmap;
+            ImageSource = updateBitmap(kmeansBitmap);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
+
+        public void ApplyNormCut()
+        {
+            NormCut cutted = new NormCut();
+            Bitmap cuttedBitmap = cutted.ApplyMethod(BitmapProperty);
+            BitmapProperty = cuttedBitmap;
+            ImageSource = updateBitmap(cuttedBitmap);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
+
+
         public int ApplyCountingObjects()
         {
             CountingObjects countigObjectsMethod = new CountingObjects();

@@ -66,6 +66,21 @@ namespace RGB_HSV.Views
             viewModel.ApplyFilling();
         }
 
+        private void ApplyNormCut(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyNormCut();
+        }
+
+        private void ApplySplitAndMerge(object sender, RoutedEventArgs e)
+        {
+            viewModel.SplitAndMerge();
+        }
+
+        private void ApplyKMeans(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyKMeans();
+        }
+
         private void ApplyErosion(object sender, RoutedEventArgs e)
         {
             viewModel.ApplyErosion();
