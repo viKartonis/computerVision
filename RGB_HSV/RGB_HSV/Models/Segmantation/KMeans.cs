@@ -24,11 +24,6 @@ namespace RGB_HSV.Models
 
         private List<Color> Centers = new List<Color>
         {
-            //Color.FromArgb(66, 90, 157),
-            //Color.FromArgb(105, 128, 180),
-            //Color.FromArgb(85, 93, 139),
-            //Color.FromArgb(139, 149, 183),
-            //Color.FromArgb(191, 190, 204)
             Color.Blue,
             Color.Red,
             Color.Black,

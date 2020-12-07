@@ -11,9 +11,19 @@ namespace RGB_HSV.Models.Formats
     {
         public double L { get; set; }
         public double H { get; set; }
-        public double c { get; set; }
+        public double C { get; set; }
 
-        public int[][] RGBToLch(Bitmap image)
+        public static Lab LCHToLab(LCH lch)
+        {
+            return new Lab
+            {
+                L = lch.L,
+                A = lch.C * Math.Cos(lch.H),
+                B = lch.C * Math.Sin(lch.H)
+            };
+        }
+
+        public static LCH[,] RGBToLch(Bitmap image)
         {
             var width = image.Width;
             var height = image.Height;
@@ -33,21 +43,21 @@ namespace RGB_HSV.Models.Formats
                     resultLab[i, j] = Lab.LabFromXYZ(resultXYZ[i, j]);
                 }
             }
-            var resultLhc = new Lch[width, height];
+            var resultLhc = new LCH[width, height];
             for (var i = 0; i < width; ++i)
             {
                 for (var j = 0; j < height; ++j)
                 {
-                    resultLhc[i, j] = new Lch 
+                    resultLhc[i, j] = new LCH
                     { 
                         L = resultLab[i, j].L, 
-                        c = resultLab[i, j].A + resultLab[i, j].B, 
-                        h = 1 
+                        C = Math.Sqrt(Math.Pow(resultLab[i, j].A,2) + Math.Pow(resultLab[i, j].B,2)), 
+                        H = resultLab[i, j].A/ resultLab[i, j].B >0 ? Math.Atan(resultLab[i, j].A / resultLab[i, j].B) :
+                         Math.Atan(resultLab[i, j].A / resultLab[i, j].B) + 360
                     };
                 }
             }
-
-            return null;
+            return resultLhc;
         }
     }
 }
