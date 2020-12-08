@@ -33,3 +33,11 @@ Cell counting by morphology
 ### Number of cells
 ![Lab3](Images/dialogWindow.PNG) 
 
+## Lab4
+Segmantation methods
+### Split and merge
+![Lab4](Images/mqysWlpctYo.jpg)
+### K-means
+![Lab4](Images/LA_SVDJcAwg.jpg)
+### Normalized cut
+![Lab4](Images/XvWf9UCzzHc.jpg)
