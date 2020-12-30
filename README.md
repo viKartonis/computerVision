@@ -41,3 +41,13 @@ Segmantation methods
 ![Lab4](Images/LA_SVDJcAwg.jpg)
 ### Normalized cut
 ![Lab4](Images/XvWf9UCzzHc.jpg)
+
+
+## Lab5
+Local features
+### Ferstner corner detector
+![Lab5](Images/Ferstner.PNG)
+### Harris corner detector
+![Lab5](Images/Harris.PNG)
+### SIFT
+![Lab5](Images/sift.PNG)
