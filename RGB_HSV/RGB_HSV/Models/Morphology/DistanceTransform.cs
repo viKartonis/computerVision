@@ -42,15 +42,14 @@ namespace RGB_HSV.Models.Morphology
             var count = 0;
             while (hasBlackPixels)
             {
-                blackPixels = 0;///почему у резалте хранятся всякие разные значения?
-                ///сделать так, чтобы выполнялось условие выхода из цикла
+                blackPixels = 0;
                 for (var offsetY = filterOffsetY; offsetY < height - filterOffsetY; ++offsetY)
                 {
                     for (var offsetX = filterOffsetX; offsetX < width - filterOffsetX; ++offsetX)
                     {
                         var max = 0;
                         byteOffset = offsetY * 4 * width + offsetX * 4;
-                        if (buffer[byteOffset] == 0)///то есть фон - это 0(чёрный)
+                        if (buffer[byteOffset] == 0)
                         {
                             blackPixels++;
                         }
@@ -66,12 +65,11 @@ namespace RGB_HSV.Models.Morphology
                                     max = buffer[calcOffset];
                                 }
                             }
-                        }////понять, где заполнять расстояниями
-                        ///может смотреть: если был чёрный, а стал белым, то заполнять?
-                        var previousResult = buffer[byteOffset];//резалт же всегда ноль
+                        }
+                        var previousResult = buffer[byteOffset];
                         result[byteOffset] = (byte)(max);
                         result[byteOffset + 1] = (byte)(max);
-                        result[byteOffset + 2] = (byte)(max);///видимо тут те самые границы, которые сокращаются
+                        result[byteOffset + 2] = (byte)(max);
                         result[byteOffset + 3] = 255;
                         if (previousResult == 0)
                         {
@@ -91,7 +89,7 @@ namespace RGB_HSV.Models.Morphology
                 {
                     result[i] = 0;
                 }
-                count++;//отладочная переменная
+                count++;
             }
             var maxDistance = 0;
             for (var i = 0; i < distances.Length; ++i)

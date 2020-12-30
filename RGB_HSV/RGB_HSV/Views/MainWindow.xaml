@@ -86,7 +86,9 @@
             <Button Click="ApplySplitAndMerge" Content="Split and merge" x:Name="SplitAndMerge"/>
             <Button Click="ApplyKMeans" Content="K-means" x:Name="KMeans"/>
             <Button Click="ApplyNormCut" Content="Normalized cut" x:Name="NCut"/>
+            <Button Click="ApplyFerstner" Content="Ferstner corner detector" x:Name="Ferstner"/>
+            <Button Click="ApplyHarris" Content="Harris corner detector" x:Name="Harris"/>
+            <Button Click="ApplySIFT" Content="SIFT" x:Name="SIFT"/>
         </StackPanel>
-
     </Grid>
 </Window>

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using RGB_HSV.Models;
 using RGB_HSV.Models.Filters;
+using RGB_HSV.Models.LocalFeatures;
 using RGB_HSV.Models.Morphology;
 using RGB_HSV.Models.Segmantation;
 
@@ -149,7 +150,7 @@ namespace RGB_HSV.ViewModels
             {
                 return;
             }
-            Bitmap blur = Blur.blurImage(BitmapProperty, value);
+            Bitmap blur = Blur.ApplyMethod(BitmapProperty, value);
             BitmapProperty = blur;
             ImageSource = updateBitmap(blur);
             BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
@@ -279,6 +280,23 @@ namespace RGB_HSV.ViewModels
             BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
+        public void ApplyCornersDetector(int flag)
+        {
+            CornersDetector corners = new CornersDetector(flag);
+            Bitmap bitmapWithCorners = corners.ApplyMethod(BitmapProperty);
+            BitmapProperty = bitmapWithCorners;
+            ImageSource = updateBitmap(bitmapWithCorners);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
+
+        public void ApplySIFT()
+        {
+            SIFT features = new SIFT();
+            Bitmap bitmapWithFeatures = features.ApplyMethod(BitmapProperty);
+            BitmapProperty = bitmapWithFeatures;
+            ImageSource = updateBitmap(bitmapWithFeatures);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
 
         public int ApplyCountingObjects()
         {

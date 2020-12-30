@@ -5,9 +5,11 @@ namespace RGB_HSV.Models.Filters
 {
     class Sodel
     {
-        private static byte[] resultBuffer { get; set; }
-
         public static byte[] resultBuf { get; private set; }
+
+        public static double[] xGradients { get; private set; }
+
+        public static double[] yGradients { get; private set; }
 
         public static double[] directions { get; private set; }
 
@@ -38,15 +40,7 @@ namespace RGB_HSV.Models.Filters
         }
         private static double NormalizeDirection(double value)
         {
-            if(value > 10)
-            {
-                value *= 1;
-            }
-            if(value < -10)
-            {
-                value *= 1;
-            }
-            value %= 180;
+            value %= 360;
             var normValue = (int) value / 45;
             var result = (Math.Abs(normValue * 45 - value) < Math.Abs(((value/2 >= 0 ? normValue + 1 : normValue - 1) * 45) - value))
                 ? normValue * 45 : (value/2 >= 0 ? normValue + 1 : normValue - 1) * 45;
@@ -67,6 +61,8 @@ namespace RGB_HSV.Models.Filters
 
             directions = new double[bytes/4];
             resultBuf = new byte[bytes / 4];
+            xGradients = new double[bytes / 4];
+            yGradients = new double[bytes / 4];
 
             var rgb = 0.0;
             for (int i = 0; i < buffer.Length; i += 4)
@@ -105,6 +101,8 @@ namespace RGB_HSV.Models.Filters
                             y += (double)(buffer[calcOffset]) * ykernel[filterY + filterOffset, filterX + filterOffset];
                         }
                     }
+                    xGradients[byteOffset/4] = x;
+                    yGradients[byteOffset/4] = y;
                     results += Math.Sqrt((x * x) + (y * y));
 
                     if (results > 255)

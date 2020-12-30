@@ -76,6 +76,16 @@ namespace RGB_HSV.Views
             viewModel.SplitAndMerge();
         }
 
+        private void ApplyHarris(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyCornersDetector(1);
+        }
+
+        private void ApplyFerstner(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyCornersDetector(0);
+        }
+
         private void ApplyKMeans(object sender, RoutedEventArgs e)
         {
             viewModel.ApplyKMeans();
@@ -99,6 +109,11 @@ namespace RGB_HSV.Views
         private void ApplyOpening(object sender, RoutedEventArgs e)
         {
             viewModel.ApplyOpening();
+        }
+
+        private void ApplySIFT(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplySIFT();
         }
 
         private void mainImage_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)

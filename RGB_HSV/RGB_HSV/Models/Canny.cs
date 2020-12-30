@@ -9,7 +9,7 @@ namespace RGB_HSV.Models.Filters
     {
         public static Bitmap ApplyCanny(Bitmap sourceImage)
         {
-            Bitmap bitmapImage = Sodel.ApplySodel(Blur.blurImage(sourceImage, 1.0));
+            Bitmap bitmapImage = Sodel.ApplySodel(Blur.ApplyMethod(sourceImage, 1.0));
             var width = bitmapImage.Width;
             var height = bitmapImage.Height;
             var values = Sodel.resultBuf;

@@ -67,7 +67,8 @@
     <Compile Include="Models\Canny.cs" />
     <Compile Include="Models\Formats\Lch.cs" />
     <Compile Include="Models\Histogram.cs" />
-    <Compile Include="Models\MathUtil.cs" />
+    <Compile Include="Models\LocalFeatures\CornersDetector.cs" />
+    <Compile Include="Models\LocalFeatures\SIFT.cs" />
     <Compile Include="Models\Morphology\Dilatation.cs" />
     <Compile Include="Models\Filters\Gabor.cs" />
     <Compile Include="Models\ImageUtils.cs" />

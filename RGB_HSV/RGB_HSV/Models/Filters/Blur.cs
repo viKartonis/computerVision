@@ -32,7 +32,7 @@ namespace RGB_HSV.Models
             return kernel;
         }
 
-        public static Bitmap blurImage(Bitmap srcImage, double sigma)
+        public static Bitmap ApplyMethod(Bitmap srcImage, double sigma)
         {
             ImageUtils image = new ImageUtils();
             var buffer = image.BitmapToBytes(srcImage);

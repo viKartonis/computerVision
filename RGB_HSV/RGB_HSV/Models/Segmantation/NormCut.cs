@@ -142,8 +142,6 @@ namespace RGB_HSV.Models.Segmantation
             var height = srcImage.Height;
             var lhcImage = LCH.RGBToLch(srcImage);
             var W = MakeMatrixes(lhcImage);
-            //var z = new Vector<double>();
-            var e = new double[width * height];
             var matrixDif = new double[width * height, width * height];
             for (var i = 0; i < width * height; ++i)
             {
@@ -155,8 +153,6 @@ namespace RGB_HSV.Models.Segmantation
             Matrix<double> matrix = DenseMatrix.OfArray(matrixDif);
             Evd<double> eigen = matrix.Evd();
             Vector<Complex> eigenvector = eigen.EigenValues;
-            //MathUtil.tred2(matrixDif, width * height, z, e);
-            //MathUtil.tqli(z, e, width * height, matrixDif);
 
             var resultBitmap = new Bitmap(width, height);
             var firstRSum = 0.0;
