@@ -36,7 +36,7 @@ Cell counting by morphology
 ## Lab4
 Segmantation methods
 ### Split and merge
-![Lab4](Images/mqysWlpctYo.jpg)
+![Lab4](Images/mqysWIpctYo.jpg)
 ### K-means
 ![Lab4](Images/LA_SVDJcAwg.jpg)
 ### Normalized cut
