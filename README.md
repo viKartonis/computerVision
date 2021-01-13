@@ -51,3 +51,11 @@ Local features
 ![Lab5](Images/Harris.PNG)
 ### SIFT
 ![Lab5](Images/sift.PNG)
+
+
+## Lab6
+Find traffic sign
+### Ransac method
+![Lab6](Images/Ransac.PNG)
+### Hough transform
+![Lab6](Images/Hough.PNG)
