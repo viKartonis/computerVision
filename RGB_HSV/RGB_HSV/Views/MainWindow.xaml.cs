@@ -55,6 +55,11 @@ namespace RGB_HSV.Views
             viewModel.ApplyDistanceTransform();
         }
 
+        private void ApplyEdgeDetecting(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyEdgeDetecting();
+        }
+
         private void ApplyCountingObjects(object sender, RoutedEventArgs e)
         {
             var count = viewModel.ApplyCountingObjects();
@@ -114,6 +119,16 @@ namespace RGB_HSV.Views
         private void ApplySIFT(object sender, RoutedEventArgs e)
         {
             viewModel.ApplySIFT();
+        }
+
+        private void ApplyRansac(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyRansac();
+        }
+
+        private void ApplyHough(object sender, RoutedEventArgs e)
+        {
+            viewModel.ApplyHough();
         }
 
         private void mainImage_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using RGB_HSV.Models;
 using RGB_HSV.Models.Filters;
+using RGB_HSV.Models.FindFigures;
 using RGB_HSV.Models.LocalFeatures;
 using RGB_HSV.Models.Morphology;
 using RGB_HSV.Models.Segmantation;
@@ -166,7 +167,7 @@ namespace RGB_HSV.ViewModels
 
         public void ApplyCanny()
         {
-            Bitmap canny = Canny.ApplyCanny(BitmapProperty);
+            Bitmap canny = Canny.ApplyMethod(BitmapProperty);
             BitmapProperty = canny;
             ImageSource = updateBitmap(canny);
             BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
@@ -208,6 +209,24 @@ namespace RGB_HSV.ViewModels
             BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 
+        public void ApplyRansac()
+        {
+            Ransac ransacMethod = new Ransac();
+            Bitmap ransac = ransacMethod.ApplyMethod(BitmapProperty);
+            BitmapProperty = ransac;
+            ImageSource = updateBitmap(ransac);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
+       
+        public void ApplyHough()
+        {
+            HoughTransform houghMethod = new HoughTransform();
+            Bitmap hough = houghMethod.ApplyMethod(BitmapProperty);
+            BitmapProperty = hough;
+            ImageSource = updateBitmap(hough);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
+
         public void ApplyDilatation()
         {
             Dilatation dilatationMethod = new Dilatation();
@@ -226,6 +245,31 @@ namespace RGB_HSV.ViewModels
             Bitmap dilatation = dilatationMethod.ApplyDilatation(BitmapProperty);
             BitmapProperty = dilatation;
             ImageSource = updateBitmap(dilatation);
+            BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
+        }
+
+        public void ApplyEdgeDetecting()
+        {
+            var erosionMethod = new Erosion();
+            var erosion = erosionMethod.ApplyErosion(BitmapProperty);
+
+            var weight = erosion.Width;
+            var height = erosion.Height;
+            var result = new Bitmap(weight, height);
+
+            for (var i = 0; i < height; ++i)
+            {
+                for(var j = 0; j < weight; ++j)
+                {
+                    if (erosion.GetPixel(j, i) != BitmapProperty.GetPixel(j, i))
+                    {
+                        result.SetPixel(j, i, Color.White);
+                    }
+                }
+            }
+
+            BitmapProperty = result;
+            ImageSource = updateBitmap(result);
             BarChart = updateBitmap(_histogram.showBarChart(BitmapProperty));
         }
 

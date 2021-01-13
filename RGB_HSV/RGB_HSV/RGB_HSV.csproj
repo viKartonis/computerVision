@@ -65,6 +65,8 @@
     <Compile Include="Models\CountingObjectscs.cs" />
     <Compile Include="Models\Filters\Blur.cs" />
     <Compile Include="Models\Canny.cs" />
+    <Compile Include="Models\FindFigures\HoughTransform.cs" />
+    <Compile Include="Models\FindFigures\Ransac.cs" />
     <Compile Include="Models\Formats\Lch.cs" />
     <Compile Include="Models\Histogram.cs" />
     <Compile Include="Models\LocalFeatures\CornersDetector.cs" />

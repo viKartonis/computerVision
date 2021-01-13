@@ -130,7 +130,6 @@ namespace RGB_HSV.Models.LocalFeatures
                         {
                             for (var sub_j = j; sub_j < j + 4; ++sub_j)
                             {
-                                    //var coef = 1.0 / (2 * Math.PI) * Math.Exp(-(sub_i - sub_j) * (sub_i - sub_j) / 2);
                                     var a = gradientDirections[sub_i, sub_j] % 360;
                                     gradients[(int)a >= 0 ? (int)a/45 
                                         : (360 + (int)a)/45]++;
